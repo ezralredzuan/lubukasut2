@@ -15,10 +15,11 @@ class Event extends Model
 
     public $timestamps = true;
 
-    protected $fillable = [
+    public $fillable = [
         'title',
         'status',
         'staff_id',
+        'content',
     ];
 
     /**

@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Filament\Resources\EventResource\Pages;
+namespace App\Filament\Resources\EventCmsResource\Pages;
 
+use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Pages\ManageRecords;
 use App\Filament\Resources\EventResource;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Actions\CreateAction;
 
 
-class ManageEvents extends ManageRecords
+class ListEventCms extends ManageRecords
 {
     protected static string $resource = EventResource::class;
+
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()
-                ->modalWidth('6xl') // ✅ Sets a wider modal for creating events
+            // Actions\CreateAction::make(),
+            \Filament\Actions\CreateAction::make()
                 ->after(function () {
-                    session()->flash('clear_grapesjs', true);
                     $this->redirect(static::getResource()::getUrl('index'));
                 }),
         ];

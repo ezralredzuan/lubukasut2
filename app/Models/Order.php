@@ -38,6 +38,18 @@ class Order extends Model
         static::creating(function ($order) {
             $order->reference_no = self::generateReferenceNumber();
         });
+
+        static::updated(function ($order) {
+            if ($order->payments()->exists()) {
+                // Update payment status to "Success" (1) when any payment is made
+                $order->update(['payment_status' => 1]);
+
+                // Update delivery status to "Ready To Deliver" (1) if payment is completed
+                if ($order->delivery_status === '-' || $order->delivery_status === null) {
+                    $order->update(['delivery_status' => 1]); // Ready To Deliver
+                }
+            }
+        });
     }
 
     protected static function generateReferenceNumber()
@@ -56,5 +68,9 @@ class Order extends Model
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id');
+    }
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'reference_no', 'reference_no');
     }
 }
