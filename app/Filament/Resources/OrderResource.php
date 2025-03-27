@@ -72,7 +72,7 @@ class OrderResource extends Resource
                                 Forms\Components\TextInput::make('price')
                                     ->label('Price')
                                     ->numeric()
-                                    ->prefix('$')
+                                    ->prefix('RM')
                                     ->required(),
                                 Forms\Components\Select::make('payment_status')
                                     ->options([
@@ -115,7 +115,7 @@ class OrderResource extends Resource
                                     Forms\Components\TextInput::make('amount')
                                         ->label('Amount')
                                         ->numeric()
-                                        ->prefix('$')
+                                        ->prefix('RM')
                                         ->required(),
                                 ])
                                 ->columns(4) // Organize inputs in columns
@@ -156,7 +156,7 @@ class OrderResource extends Resource
                 ->afterStateUpdated(fn ($record, $state) => $record->update(['delivery_status' => $state])), // Saves changes automatically
 
 
-            TextColumn::make('price')->money()->sortable(),
+            TextColumn::make('price')->prefix('RM ')->sortable(),
             TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             TextColumn::make('updated_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
         ])
