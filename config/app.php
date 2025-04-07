@@ -1,5 +1,8 @@
 <?php
 
+use Gloudemans\Shoppingcart\Facades\Cart;
+use Hardevine\Shoppingcart\ShoppingcartServiceProvider;
+
 return [
 
     /*
