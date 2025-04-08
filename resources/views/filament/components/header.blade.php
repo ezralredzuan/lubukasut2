@@ -15,6 +15,7 @@ Session::put('customer', $customer);
         <ul class="flex space-x-10 mr-10">
             <li><a href="{{ route('home') }}" class="text-white hover:text-yellow-500">Home</a></li>
             <li><a href="{{ route('product') }}" class="text-white hover:text-yellow-500">Shop</a></li>
+            <li><a href="{{ route('events.index') }}" class="text-white hover:text-yellow-500">Event</a></li>
             <li><a href="{{ route('about') }}" class="text-white hover:text-yellow-500">About</a></li>
             <li><a href="{{ route('faq') }}" class="text-white hover:text-yellow-500">Contact</a></li>
         </ul>

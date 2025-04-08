@@ -4,6 +4,7 @@ use App\Models\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\InquiriesController;
@@ -40,6 +41,14 @@ Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
+Route::get('/events', function () {
+    return view('events');
+})->name('events');
+
+
+Route::get('/order/success', [CheckoutController::class, 'orderSuccess'])->name('order.success');
+
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('product');
 
@@ -47,7 +56,9 @@ Route::post('/checkout/store', [CheckoutController::class, 'store'])->name('chec
 Route::post('/checkout/apply-coupon', [CheckoutController::class, 'applyCoupon']);
 Route::get('/checkout', function () {return view('checkout');})->name('checkout');
 Route::post('/checkout/process', function (Illuminate\Http\Request $request) {session(['cart' => json_decode($request->cart_items, true)]);return redirect()->route('checkout');})->name('checkout.process');
-Route::get('/order-success', function () {return view('order.success');})->name('order.success');
+
+Route::get('/events', [EventController::class, 'index'])->name('events.index');
+Route::get('/events/{id}', [EventController::class, 'show'])->name('events.show');
 
 
 Route::post('/inquiries', [InquiriesController::class, 'store'])->name('inquiries.store');
@@ -59,6 +70,9 @@ Route::post('/customer/register', [CustomerAuthController::class, 'register'])->
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/product', [ProductController::class, 'index'])->name('product');
+
+Route::get('/receipt/{ref}', [CheckoutController::class, 'receipt'])->name('receipt.show');
+
 
 
 

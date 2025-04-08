@@ -20,6 +20,7 @@ class Event extends Model
         'status',
         'staff_id',
         'content',
+        'image_cover',
     ];
 
     /**

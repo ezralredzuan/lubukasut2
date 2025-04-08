@@ -489,7 +489,13 @@ a {
 
         </div>
       </footer>
-
+      @if(session('checkout_success'))
+      <script>
+          window.addEventListener('DOMContentLoaded', () => {
+              localStorage.removeItem('cart');
+          });
+      </script>
+      @endif
 
 
 

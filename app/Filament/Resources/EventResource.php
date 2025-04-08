@@ -31,6 +31,11 @@ class EventResource extends Resource
             ->default(fn () => Auth::id()) // ✅ Ensures the value is set
             ->required(),
 
+            Forms\Components\FileUpload::make('image_cover')
+            ->label('Image Cover')
+            ->image()
+            ->maxSize(1024) // Max 1MB
+            ->nullable(),
 
             Forms\Components\TextInput::make('title')
                 ->required()
@@ -87,6 +92,8 @@ class EventResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                 ->toggleable()
                 ->searchable(),
+                Tables\Columns\ImageColumn::make('image_cover')->circular(), // Display profile picture
+
                 Tables\Columns\TextColumn::make('status')
                     ->formatStateUsing(fn ($state) => $state === 'Published' ? 'Published' : 'Draft')
                     ->color(fn ($state) => $state === 'Published' ? 'success' : 'danger')

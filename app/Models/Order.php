@@ -28,8 +28,9 @@ class Order extends Model
         'shipped_date',
         'price',
         'customer_id',
-        'product_id',
+        'product_id'
     ];
+
 
     protected static function boot()
     {
@@ -65,9 +66,9 @@ class Order extends Model
         return $this->belongsTo(Customer::class, 'customer_id');
     }
 
-    public function product()
+    public function products()
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsToMany(Product::class, 'order_product', 'order_id', 'product_id');
     }
     public function payments()
     {

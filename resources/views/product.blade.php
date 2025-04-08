@@ -73,14 +73,15 @@
             </div>
 
             <!-- Checkout Button -->
-            <form x-ref="cartForm" action="{{ route('checkout.process') }}" method="POST">
+            <form x-ref="cartForm" action="{{ route('checkout.process') }}" method="POST" @submit.prevent="submitCart">
                 @csrf
                 <input type="hidden" name="cart_items" x-model="JSON.stringify(cart)">
                 <button type="submit"
-                class="w-full px-6 py-3 bg-white text-red-600 border border-red-600 font-bold rounded-full shadow hover:bg-red-50 transition duration-300">
+                    class="w-full px-6 py-3 bg-white text-red-600 border border-red-600 font-bold rounded-full shadow hover:bg-red-50 transition duration-300">
                     Proceed to Checkout
                 </button>
             </form>
+
 
         </div>
     </div>
@@ -176,8 +177,8 @@
                         class="mt-3 inline-block px-6 py-2 bg-white text-red-600 border border-red-600 font-bold rounded-full shadow hover:bg-red-50 transition duration-300">
                     View Item
                     </button>
-                    <button @click="addToCart($event, '{{ $product->name }}', {{ $product->price }}, '{{ asset('storage/' . $product->product_image) }}')"
-                            class="mt-3 inline-block px-6 py-2 bg-red-600 text-white font-bold rounded-full shadow hover:bg-red-700 transition duration-300">
+                    <button @click="addToCart($event, {{ $product->id }}, '{{ $product->name }}', {{ $product->price }}, '{{ asset('storage/' . $product->product_image) }}')"
+                        class="mt-3 inline-block px-6 py-2 bg-red-600 text-white font-bold rounded-full shadow hover:bg-red-700 transition duration-300">
                         Add to Cart
                     </button>
                 </div>
@@ -220,7 +221,7 @@
                     <p class="text-sm text-gray-500" x-text="'Size: ' + modalProduct.size"></p>
                     <p class="text-xl font-semibold text-red-600" x-text="'RM ' + modalProduct.price.toFixed(2)"></p>
                     <p class="text-gray-700" x-text="modalProduct.description"></p>
-                    <button @click="addToCart($event, '{{ $product->name }}', {{ $product->price }}, '{{ asset('storage/' . $product->product_image) }}')"
+                    <button @click="addToCart($event, {{ $product->id }}, '{{ $product->name }}', {{ $product->price }}, '{{ asset('storage/' . $product->product_image) }}')"
                         class="mt-2 inline-block px-6 py-2 bg-red-600 text-white font-bold rounded-full shadow hover:bg-red-700 transition duration-300">
                         Add to Cart
                     </button>
@@ -233,63 +234,79 @@
     @include('filament.components.footer')
 
     <script>
-        function cartStore() {
-            return {
-                cart: [],
-                isCartOpen: false,
-                isModalOpen: false,
-                modalProduct: {},
-                openCart() { this.isCartOpen = true; },
-                closeCart() { this.isCartOpen = false; },
-                openModal() { this.isModalOpen = true; },
-                closeModal() { this.isModalOpen = false; },
-                viewItem(productId) {
-                    fetch(`/product/${productId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            data.image = data.product_image ? `/storage/${data.product_image}` : '/images/no-image.png';
+function cartStore() {
+    return {
+        cart: JSON.parse(localStorage.getItem('cart')) || [],
+        isCartOpen: false,
+        isModalOpen: false,
+        modalProduct: {},
 
-                            // Parse the price to a number so .toFixed works
-                            data.price = parseFloat(data.price);
+        openCart() { this.isCartOpen = true; },
+        closeCart() { this.isCartOpen = false; },
+        openModal() { this.isModalOpen = true; },
+        closeModal() { this.isModalOpen = false; },
 
-                            this.modalProduct = data;
-                            this.openModal();
-                        });
-                },
-                addToCart(event, name, price, image) {
-                    const button = event.target;
-                    const rect = button.getBoundingClientRect();
-                    const clone = document.createElement("img");
-
-                    clone.src = image;
-                    clone.classList.add("flying-item");
-                    document.body.appendChild(clone);
-
-                    clone.style.left = `${rect.left}px`;
-                    clone.style.top = `${rect.top}px`;
-                    clone.style.width = "50px";
-                    clone.style.height = "50px";
-
-                    setTimeout(() => {
-                        clone.style.transform = `translate(${window.innerWidth - 100}px, 20px) scale(0)`;
-                        clone.style.opacity = "0";
-                    }, 10);
-
-                    setTimeout(() => {
-                        document.body.removeChild(clone);
-                        this.cart.push({ name, price, image });
-                    }, 500);
-                },
-                removeFromCart(index) {
-                    this.cart.splice(index, 1);
-                },
-                get cartTotal() {
-                    return this.cart.reduce((total, item) => total + item.price, 0);
-                }
+        viewItem(productId) {
+            fetch(`/product/${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.image = data.product_image ? `/storage/${data.product_image}` : '/images/no-image.png';
+                    data.price = parseFloat(data.price);
+                    this.modalProduct = data;
+                    this.openModal();
+                });
+        },
 
 
-            };
+
+        addToCart(event, id, name, price, image) {
+            const button = event.target;
+            const rect = button.getBoundingClientRect();
+            const clone = document.createElement("img");
+
+            clone.src = image;
+            clone.classList.add("flying-item");
+            document.body.appendChild(clone);
+
+            clone.style.left = `${rect.left}px`;
+            clone.style.top = `${rect.top}px`;
+            clone.style.width = "50px";
+            clone.style.height = "50px";
+
+            setTimeout(() => {
+                clone.style.transform = `translate(${window.innerWidth - 100}px, 20px) scale(0)`;
+                clone.style.opacity = "0";
+            }, 10);
+
+            setTimeout(() => {
+                document.body.removeChild(clone);
+                this.cart.push({ id, name, price, image }); // <--- include ID here
+                this.saveCartToLocalStorage();
+            }, 500);
+        },
+
+
+        removeFromCart(index) {
+            this.cart.splice(index, 1);
+            this.saveCartToLocalStorage();
+        },
+
+        get cartTotal() {
+            return this.cart.reduce((total, item) => total + item.price, 0);
+        },
+
+        saveCartToLocalStorage() {
+            localStorage.setItem('cart', JSON.stringify(this.cart));
+        },
+
+        submitCart() {
+            this.saveCartToLocalStorage();
+
+            // Submit the form manually after saving
+            this.$refs.cartForm.submit();
         }
+    };
+}
 
     </script>
 </body>
